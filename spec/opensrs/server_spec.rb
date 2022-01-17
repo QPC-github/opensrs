@@ -54,6 +54,7 @@ describe OpenSRS::Server do
       allow(xml_processor).to receive(:parse).and_return response_xml
       allow(server).to receive(:xml_processor).and_return xml_processor
       allow(http).to receive(:post).and_return response
+      allow(http).to receive(:ciphers=)
       allow(Net::HTTP).to receive(:new).and_return http
     end
 
