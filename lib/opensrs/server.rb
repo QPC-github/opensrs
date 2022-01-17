@@ -45,7 +45,7 @@ module OpenSRS
     end
 
     def call(data = {})
-      xml = xml_processor.build({ :protocol => "XCP" }.merge!(data))
+      xml = XmlProcessor.build({ :protocol => "XCP" }.merge!(data))
       log('Request', xml, data)
 
       begin
@@ -55,21 +55,12 @@ module OpenSRS
         raise OpenSRS::BadResponse, "Received a bad response from OpenSRS. Please check that your IP address is added to the whitelist, and try again."
       end
 
-      parsed_response = xml_processor.parse(response.body)
+      parsed_response = XmlProcessor.parse(response.body)
       return OpenSRS::Response.new(parsed_response, xml, response.body)
     rescue Timeout::Error => err
       raise OpenSRS::TimeoutError, err
     rescue Errno::ECONNRESET, Errno::ECONNREFUSED => err
       raise OpenSRS::ConnectionError, err
-    end
-
-    def xml_processor
-      @@xml_processor
-    end
-
-    def self.xml_processor=(name)
-      require "opensrs/xml_processor/#{name.to_s.downcase}"
-      @@xml_processor = OpenSRS::XmlProcessor.const_get("#{name.to_s.capitalize}")
     end
 
     private

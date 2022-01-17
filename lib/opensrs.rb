@@ -1,3 +1,5 @@
+require "nokogiri"
+
 require "opensrs/xml_processor"
 require "opensrs/server"
 require "opensrs/response"
