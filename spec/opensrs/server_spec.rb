@@ -1,8 +1,4 @@
 describe OpenSRS::Server do
-  before(:each) do
-    OpenSRS::Server.xml_processor = :libxml
-  end
-
   let(:server) { OpenSRS::Server.new }
 
   describe '#new' do
@@ -45,7 +41,7 @@ describe OpenSRS::Server do
     let(:header) { {"some" => "header" } }
     let(:xml) { '<some xml></some xml>' }
     let(:response_xml) { xml }
-    let(:xml_processor) { double OpenSRS::XmlProcessor }
+    let(:xml_processor) { OpenSRS::XmlProcessor }
     let(:http) { double(Net::HTTP, :use_ssl= => true, :verify_mode= => true)  }
 
     before :each do
@@ -192,16 +188,6 @@ describe OpenSRS::Server do
           expect(logger.messages.first).to include("\n")
         end
       end
-    end
-  end
-
-  describe "#test xml processor" do
-    context "on changing xml processor" do
-      before(:each) do
-        OpenSRS::Server.xml_processor = :nokogiri
-      end
-
-      it { expect(server.xml_processor).to eql(OpenSRS::XmlProcessor::Nokogiri) }
     end
   end
 end

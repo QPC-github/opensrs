@@ -1,20 +1,15 @@
-OpenSRS::Server.xml_processor = :nokogiri
-
-class OrderedHash < Hash
-end
-
-describe OpenSRS::XmlProcessor::Nokogiri do
+describe OpenSRS::XmlProcessor do
   describe ".build" do
     it "should create XML for a nested hash" do
       attributes = {:foo => {:bar => 'baz'}}
-      xml = OpenSRS::XmlProcessor::Nokogiri.build(attributes)
+      xml = OpenSRS::XmlProcessor.build(attributes)
 
       expect(xml).to eq %{<?xml version=\"1.0\"?>\n<OPS_envelope>\n  <header>\n    <version>0.9</version>\n  </header>\n  <body>\n    <data_block>\n      <dt_assoc>\n        <item key=\"foo\">\n          <dt_assoc>\n            <item key=\"bar\">baz</item>\n          </dt_assoc>\n        </item>\n      </dt_assoc>\n    </data_block>\n  </body>\n</OPS_envelope>\n}
     end
 
     it "should encode trailing '<'" do
       attributes = {:foo => {:bar => 'baz&<'}}
-      xml = OpenSRS::XmlProcessor::Nokogiri.build(attributes)
+      xml = OpenSRS::XmlProcessor.build(attributes)
 
       expect(xml).to eq %{<?xml version=\"1.0\"?>\n<OPS_envelope>\n  <header>\n    <version>0.9</version>\n  </header>\n  <body>\n    <data_block>\n      <dt_assoc>\n        <item key=\"foo\">\n          <dt_assoc>\n            <item key=\"bar\">baz&amp;&lt;</item>\n          </dt_assoc>\n        </item>\n      </dt_assoc>\n    </data_block>\n  </body>\n</OPS_envelope>\n}
     end
@@ -29,7 +24,7 @@ describe OpenSRS::XmlProcessor::Nokogiri do
 
     context "on a 3 element array" do
       before(:each) do
-        @e = OpenSRS::XmlProcessor::Nokogiri.encode_data([1,2,3], @doc)
+        @e = OpenSRS::XmlProcessor.encode_data([1,2,3], @doc)
       end
 
       it { expect(@e).to be_an_instance_of(::Nokogiri::XML::Element) }
@@ -47,7 +42,7 @@ describe OpenSRS::XmlProcessor::Nokogiri do
 
     context "on a hash" do
       before(:each) do
-        @e = OpenSRS::XmlProcessor::Nokogiri.encode_data({:name => "kitteh"}, @doc)
+        @e = OpenSRS::XmlProcessor.encode_data({:name => "kitteh"}, @doc)
       end
 
       it { expect(@e).to be_an_instance_of(::Nokogiri::XML::Element) }
@@ -57,26 +52,10 @@ describe OpenSRS::XmlProcessor::Nokogiri do
       it { expect(@e.children[0].name).to eql('item') }
       it { expect(@e.children[0].attributes["key"].value).to eql('name') }
     end
-
-    context "on a hash subclass" do
-      before(:each) do
-        ohash = OrderedHash.new
-        ohash[:name] = 'kitten'
-        @e = OpenSRS::XmlProcessor::Nokogiri.encode_data(ohash, @doc)
-      end
-
-      it { expect(@e).to be_an_instance_of(::Nokogiri::XML::Element) }
-      it { expect(@e.name).to eql('dt_assoc') }
-
-      it { expect(@e.children.count).to be(1) }
-      it { expect(@e.children[0].name).to eql('item') }
-      it { expect(@e.children[0].attributes["key"].value).to eql('name') }
-    end
-
 
     context "on a nested hash" do
       before(:each) do
-        @e          = OpenSRS::XmlProcessor::Nokogiri.encode_data({:suggestion => {:maximum => "10"}}, @doc)
+        @e          = OpenSRS::XmlProcessor.encode_data({:suggestion => {:maximum => "10"}}, @doc)
         @suggestion = @e.children[0]
         @dt_assoc   = @suggestion.children[0]
       end
@@ -107,14 +86,14 @@ describe OpenSRS::XmlProcessor::Nokogiri do
     end
 
     context "produces a scalar" do
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data("cheezburger")).to eql("cheezburger") }
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data("<smile>")).to eql("<smile>") }
+      it { expect(OpenSRS::XmlProcessor.encode_data("cheezburger")).to eql("cheezburger") }
+      it { expect(OpenSRS::XmlProcessor.encode_data("<smile>")).to eql("<smile>") }
 
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data(12345)).to eql("12345") }
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data(Date.parse("2010/02/12"))).to eql("2010-02-12") }
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data(:name)).to eql("name") }
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data(true)).to eql("true") }
-      it { expect(OpenSRS::XmlProcessor::Nokogiri.encode_data(false)).to eql("false") }
+      it { expect(OpenSRS::XmlProcessor.encode_data(12345)).to eql("12345") }
+      it { expect(OpenSRS::XmlProcessor.encode_data(Date.parse("2010/02/12"))).to eql("2010-02-12") }
+      it { expect(OpenSRS::XmlProcessor.encode_data(:name)).to eql("name") }
+      it { expect(OpenSRS::XmlProcessor.encode_data(true)).to eql("true") }
+      it { expect(OpenSRS::XmlProcessor.encode_data(false)).to eql("false") }
     end
   end
 
@@ -135,7 +114,7 @@ describe OpenSRS::XmlProcessor::Nokogiri do
             </body>
           </OPS_envelope>}
 
-        @response = OpenSRS::XmlProcessor::Nokogiri.parse(xml)
+        @response = OpenSRS::XmlProcessor.parse(xml)
       end
 
       it { expect(@response).to eql("Tom Jones") }
@@ -164,7 +143,7 @@ describe OpenSRS::XmlProcessor::Nokogiri do
           </body>
         </OPS_envelope>}
 
-        @response = OpenSRS::XmlProcessor::Nokogiri.parse(xml)
+        @response = OpenSRS::XmlProcessor.parse(xml)
       end
 
       it { expect(@response["domain_list"]).to be_an_instance_of(Array) }
@@ -205,7 +184,7 @@ describe OpenSRS::XmlProcessor::Nokogiri do
           </body>
         </OPS_envelope>}
 
-        @response = OpenSRS::XmlProcessor::Nokogiri.parse(xml)
+        @response = OpenSRS::XmlProcessor.parse(xml)
       end
 
       it { expect(@response["contact_set"]["owner"]["first_name"]).to eql("Tom") }
@@ -242,7 +221,7 @@ describe OpenSRS::XmlProcessor::Nokogiri do
             </body>
           </OPS_envelope>}
 
-        @response = OpenSRS::XmlProcessor::Nokogiri.parse(xml)
+        @response = OpenSRS::XmlProcessor.parse(xml)
       end
 
       it { expect(@response).to be_an_instance_of(Hash) }

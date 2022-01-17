@@ -27,7 +27,6 @@ For Rails 3.x and above, add it to the `Gemfile`:
 
     gem 'opensrs'
     gem 'nokogiri'    # if you want to use nokogiri as the XML parser
-    gem 'libxml-ruby' # if you want to use libxml as the XML parser
 
 ### Usage
 
@@ -37,14 +36,6 @@ This library provides basic functionality for interacting with the OpenSRS XML A
 - Error reporting
 - XML encoding
 - XML decoding
-
-Currently, the library supports LibXML and Nokogiri as XML parsers. By default, it uses LibXML to parse and generate XML. If you'd like to use Nokogiri (1.4.7 and below) for parsing XML, then in one of your app initializers add the following line:
-
-    OpenSRS::Server.xml_processor = :nokogiri
-
-or
-
-    OpenSRS::Server.xml_processor = :libxml
 
 To connect, instantiate a new <tt>OpenSRS::Server</tt> object:
 

@@ -4,9 +4,6 @@ $LOAD_PATH.unshift File.expand_path('../../lib', __FILE__)
 
 require 'opensrs'
 
-class OrderedHash < Hash
-end
-
 class OpenSRS::TestLogger
   attr_reader :messages
 
